@@ -19,9 +19,9 @@ public class GenerateVerificationCode
 {
     private readonly ILogger<GenerateVerificationCode> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly VerificationService _verificationService;
+    private readonly VerificationGenerateService _verificationService;
 
-    public GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, IServiceProvider serviceProvider, VerificationService verificationService)
+    public GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, IServiceProvider serviceProvider, VerificationGenerateService verificationService)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
