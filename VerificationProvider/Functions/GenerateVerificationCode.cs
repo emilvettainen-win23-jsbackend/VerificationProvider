@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
@@ -34,7 +35,7 @@ public class GenerateVerificationCode
     {
         try
         {
-            var verificationRequest = JsonConvert.DeserializeObject<VerificationRequestModel>(message.Body.ToString());
+            var verificationRequest = JsonConvert.DeserializeObject<VerificationRequestModel>(Encoding.UTF8.GetString(message.Body));
             if (verificationRequest == null)
             {
                 return null!;
