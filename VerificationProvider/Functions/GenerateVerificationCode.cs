@@ -7,7 +7,7 @@ using VerificationProvider.Helpers.Validations;
 using VerificationProvider.Models;
 using VerificationProvider.Services;
 
-namespace VerificationProvider.Functions.Queue;
+namespace VerificationProvider.Functions;
 
 public class GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, IServiceProvider serviceProvider, VerificationGenerateService verificationService)
 {
