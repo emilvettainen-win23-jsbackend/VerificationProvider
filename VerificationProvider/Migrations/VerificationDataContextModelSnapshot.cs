@@ -36,7 +36,7 @@ namespace VerificationProvider.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("VerificationRequests");
+                    b.ToTable("VerificationRequests", (string)null);
                 });
 #pragma warning restore 612, 618
         }

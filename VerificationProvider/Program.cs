@@ -14,29 +14,12 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services.AddDbContext<VerificationDataContext>(x => x.UseSqlServer(context.Configuration.GetConnectionString("AzureDb")));
-        services.AddSingleton(new ServiceBusClient(context.Configuration.GetConnectionString("ServiceBusConnection")));
+        services.AddSingleton(new ServiceBusClient(Environment.GetEnvironmentVariable("ServiceBusConnection")));
 
         services.AddScoped<ValidateVerificationService>();
         services.AddScoped<VerificationCleanerService>();
         services.AddScoped<VerificationGenerateService>();
     })
     .Build();
-
-//using (var scope = host.Services.CreateScope())
-//{
-//    try
-//    {
-//        var context = scope.ServiceProvider.GetRequiredService<VerificationDataContext>();
-//        var migration = context.Database.GetPendingMigrations();
-//        if (migration != null && migration.Any())
-//        {
-//            context.Database.Migrate();
-//        }
-//    }
-//    catch (Exception ex)
-//    {
-//        Debug.WriteLine($" ERROR : VerificationProvider.Program.cs.Migration :: {ex.Message}");
-//    }
-//}
 
 host.Run();
