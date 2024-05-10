@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using VerificationProvider.Helpers.Validations;
 using VerificationProvider.Services;
 
-namespace VerificationProvider.Functions.Http;
+namespace VerificationProvider.Functions;
 
 public class ValidateVerificationCode
 {
@@ -24,7 +24,7 @@ public class ValidateVerificationCode
         try
         {
             var validateRequest = await _validateVerificationService.UnpackValidateRequestAsync(req);
-            if (validateRequest == null) 
+            if (validateRequest == null)
             {
                 return new BadRequestResult();
             }
