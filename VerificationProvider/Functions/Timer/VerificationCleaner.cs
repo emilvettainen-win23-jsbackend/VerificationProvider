@@ -2,7 +2,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using VerificationProvider.Services;
 
-namespace VerificationProvider.Functions
+namespace VerificationProvider.Functions.Timer
 {
     public class VerificationCleaner(ILogger<VerificationCleaner> logger, VerificationCleanerService verificationCleanerService)
     {

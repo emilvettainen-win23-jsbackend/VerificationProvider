@@ -1,12 +1,8 @@
-﻿using Azure.Messaging.ServiceBus;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using VerificationProvider.Data.Contexts;
-using VerificationProvider.Functions;
-using VerificationProvider.Helpers;
 using VerificationProvider.Models;
 
 namespace VerificationProvider.Services;
@@ -16,31 +12,6 @@ public class VerificationGenerateService(ILogger<VerificationGenerateService> lo
     private readonly ILogger<VerificationGenerateService> _logger = logger;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public VerificationRequestModel UnpackVerificationRequest(ServiceBusReceivedMessage message)
-    {
-        try
-        {
-            var verificationRequest = JsonConvert.DeserializeObject<VerificationRequestModel>(message.Body.ToString());
-            if (verificationRequest != null)
-            {
-                var validation = CustomValidation.ValidateVerificationRequest(verificationRequest);
-                if (!validation.IsValid)
-                {
-                    foreach (var error in validation.ValidationResults)
-                    {
-                        _logger.LogError($"Validation Error :: {error.ErrorMessage}");
-                    }
-                    return null!;
-                }
-                return verificationRequest;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"ERROR : VerificationGenerateService.UnpackVerificationRequest() :: {ex.Message}");
-        }
-        return null!;
-    }
 
     public string GenerateCode()
     {
@@ -77,19 +48,19 @@ public class VerificationGenerateService(ILogger<VerificationGenerateService> lo
                                 <body>
                                     <div style='max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff;'>
                                         <div style='background-color: #0046ae; color: white; padding: 10px 20px; text-align: center;'>
-                                            <h1>Verify {verificationRequest.Email}</h1>
+                                            <h1>Verify</h1>
                                         </div>
                                         <div style='padding: 20px;'>
                                             <p>Hello,</p>
-                                            <p>Thank you for registering with us. To complete your registration, please enter the following verification code in the appropriate field:</p>
+                                            <p>To complete your request, please enter the following verification code in the appropriate field:</p>
                                             <p style='font-weight: bold; font-size: 24px; color: #0046ae;'>{code}</p>
-                                            <p style='margin-top: 20px;'>If you did not request this code, you can safely ignore this email. Otherwise, please proceed to verify {verificationRequest.Email} to enjoy our services fully.</p>
+                                            <p style='margin-top: 20px;'>If you did not request this code, you can safely ignore this email. Otherwise, please proceed to verify your request.</p>
                                             <p>Thank you!<br>Silicon</p>
                                         </div>
                                     </div>
                                 </body>
                                 </html>",
-                    PlainText = $"Verify {verificationRequest.Email}, Thank you for registering with us. To complete your registration, please enter the following verification code: {code} in the appropriate field, If you did not request this code, you can safely ignore this email. Otherwise, please proceed to verify {verificationRequest.Email} to enjoy our services fully. Thank you! Silicon"
+                    PlainText = $"Verify, To complete your request, please enter the following verification code: {code} in the appropriate field, If you did not request this code, you can safely ignore this email. Otherwise, please proceed to verify your request. Thank you! Silicon"
                 };
                 return emailRequest;
             }
@@ -101,12 +72,12 @@ public class VerificationGenerateService(ILogger<VerificationGenerateService> lo
         return null!;
     }
 
-    public async Task<bool> SaveVerificationRequest(VerificationRequestModel verificationRequest, string code)
+    public async Task<bool> SaveVerificationRequestAsync(VerificationRequestModel verificationRequestModel, string code)
     {
         try
         {
             using var context = _serviceProvider.GetRequiredService<VerificationDataContext>();
-            var existingRequest = await context.VerificationRequests.FirstOrDefaultAsync(x => x.Email == verificationRequest.Email);
+            var existingRequest = await context.VerificationRequests.FirstOrDefaultAsync(x => x.Email == verificationRequestModel.Email);
             if (existingRequest != null)
             {
                 existingRequest.Code = code;
@@ -115,33 +86,16 @@ public class VerificationGenerateService(ILogger<VerificationGenerateService> lo
             }
             else
             {
-                context.VerificationRequests.Add(new Data.Entities.VerificationRequestEntity() { Email = verificationRequest.Email, Code = code });
+                context.VerificationRequests.Add(new Data.Entities.VerificationRequestEntity() { Email = verificationRequestModel.Email, Code = code });
             }
             await context.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError($"ERROR : VerificationGenerateService.SaveVerificationRequest() :: {ex.Message}");
+            _logger.LogError($"ERROR : VerificationGenerateService.SaveVerificationRequestAsync() :: {ex.Message}");
         }
         return false;
-    }
-
-    public string GenerateServiceBusEmailRequest(EmailRequestModel model)
-    {
-        try
-        {
-            var payload = JsonConvert.SerializeObject(model);
-            if (!string.IsNullOrEmpty(payload))
-            {
-                return payload;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"ERROR : VerificationGenerateService.GenerateServiceBusEmailRequest() :: {ex.Message}");
-        }
-        return null!;
     }
 
 

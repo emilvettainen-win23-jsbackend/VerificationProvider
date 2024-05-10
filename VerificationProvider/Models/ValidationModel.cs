@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VerificationProvider.Helpers;
+namespace VerificationProvider.Models;
 
 public class ValidationModel<T>
 {

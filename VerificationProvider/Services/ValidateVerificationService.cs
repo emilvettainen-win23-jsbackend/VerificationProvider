@@ -7,16 +7,10 @@ using VerificationProvider.Models;
 
 namespace VerificationProvider.Services
 {
-    public class ValidateVerificationService
+    public class ValidateVerificationService(ILogger<ValidateVerificationService> logger, VerificationDataContext verificationDataContext)
     {
-        private readonly ILogger<ValidateVerificationService> _logger;
-        private readonly VerificationDataContext _context;
-
-        public ValidateVerificationService(ILogger<ValidateVerificationService> logger, VerificationDataContext verificationDataContext)
-        {
-            _logger = logger;
-            _context = verificationDataContext;
-        }
+        private readonly ILogger<ValidateVerificationService> _logger = logger;
+        private readonly VerificationDataContext _context = verificationDataContext;
 
         public async Task<ValidateRequestModel> UnpackValidateRequestAsync(HttpRequest req)
         {

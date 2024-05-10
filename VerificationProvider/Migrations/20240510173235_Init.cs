@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VerificationProvider.Migrations
 {
     /// <inheritdoc />
-    public partial class VerificationRequestsTableAdded : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
